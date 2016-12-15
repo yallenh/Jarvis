@@ -7,10 +7,12 @@ Just a Rather Very Intelligent System
 # Set up
 
 * NodeJS setup: https://nodejs.org/en/download/
+```
+$ npm install -g protractor
+```
 
 * Open screen 1 for selenium server, refer to [protractor(setup)](http://www.protractortest.org/#/tutorial#setup):
 ```
-$ sudo npm install -g protractor
 $ webdriver-manager update
 $ webdriver-manager start
 ```
