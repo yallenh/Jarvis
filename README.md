@@ -6,15 +6,19 @@ Just a Rather Very Intelligent System
 
 # Set up
 
-* NodeJS setup: https://nodejs.org/en/download/
+* Instal JDK: http://www.oracle.com/technetwork/java/javase/downloads/index.html
+
+* Instal Node: https://nodejs.org/en/download/
+
+* Setup protractor: 
 ```
-$ npm install -g protractor
+$ sudo npm install -g protractor
 ```
 
 * Open screen 1 for selenium server, refer to [protractor(setup)](http://www.protractortest.org/#/tutorial#setup):
 ```
-$ webdriver-manager update
-$ webdriver-manager start
+$ sudo webdriver-manager update
+$ sudo webdriver-manager start
 ```
 
 * Open screen 2 for running case, refer to [protractor(write a test)](http://www.protractortest.org/#/tutorial#step-0-write-a-test):
