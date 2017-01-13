@@ -28,12 +28,15 @@ describe('Comic', function() {
                     $('.img_right.nextPageButtonJs').click();
                     saveImageToFolder(folder, count + 1);
                 });
+            } else {
+                saveBookFromBookDB();
             }
         });
     }
     function saveBookFromBookDB() {
         var book = bookDB.pop();
         if (!book) {
+            console.log('NO BOOK, DONE!');
             return;
         }
         console.log('\nDownload', book.name, 'from', book.url, '...');
