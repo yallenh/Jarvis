@@ -1,0 +1,19 @@
+var fs = require('fs');
+var request = require('request');
+
+module.exports = {
+    'download': function(uri, filename, callback) {
+        request.head(uri, function(err, res, body) {
+            // console.log('content-type:', res.headers['content-type']);
+            // console.log('content-length:', res.headers['content-length']);
+            request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+        });
+    },
+    'mkdir': function(dir) {
+        if (!fs.existsSync(dir)){
+            fs.mkdirSync(dir);
+            return true;
+        }
+        return false;
+    }
+};
