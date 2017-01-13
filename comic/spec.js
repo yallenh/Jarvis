@@ -1,8 +1,15 @@
-var fsUtil = require('./fsutil.js');
+var fsUtil = require('../fsutil');
 var baseUrl = '';
+var baseFolder = '../books';
 
 describe('Comic', function() {
-    var episodes = [];
+    var bookDB = [];
+    var Book = function (name, url) {
+        return {
+            name: name,
+            url: url
+        };
+    }
     var driver = browser.driver;
     function $get(url) {
         return driver.get(url);
@@ -14,9 +21,9 @@ describe('Comic', function() {
         driver.isElementPresent(by.css('#defualtPagePic')).then(function(value) {
             if (value) {
                 $('#defualtPagePic').getAttribute('src').then(function(url) {
-                    var addr = [folder, count + '.jpg'].join('/');
+                    var addr = [baseFolder, folder, count + '.jpg'].join('/');
                     fsUtil.download(url, addr, function(){
-                        console.log(count);
+                        console.log('\t', addr);
                     });
                     $('.img_right.nextPageButtonJs').click();
                     saveImageToFolder(folder, count + 1);
@@ -24,32 +31,64 @@ describe('Comic', function() {
             }
         });
     }
-    function saveBookFromUrl(url) {
-        $get(url);
-        $('.pageTitle a:nth-child(2)').getText().then(function(title) {
-            fsUtil.mkdir(title);
-            $('.pageTitle strong').getText().then(function(episode) {
-                console.log('download ' + episode);
-                var count = 1;
-                var folder = [title, episode].join('/');
-                fsUtil.mkdir(folder);
-                saveImageToFolder(folder, count);
-            });
-        });
-    }
+    var saveBookFromBookDB = function () {
+        var book = bookDB.pop();
+        if (!book) {
+            return;
+        }
 
-    it('Episodes', function() {
+        console.log('\nDownload', book.name, 'from', book.url, '...');
+        $get(book.url);
+        driver.isElementPresent(by.css('.pageTitle a:nth-child(2)')).then(function(present) {
+            if (present) {
+                $('.pageTitle a:nth-child(2)').getText().then(function(title) {
+                    fsUtil.mkdir(title);
+                    $('.pageTitle strong').getText().then(function(episode) {
+                        var count = 1;
+                        var folder = [title, episode].join('/');
+                        fsUtil.mkdir(folder);
+                        saveImageToFolder(folder, count);
+                    });
+                });
+            } else {
+                console.log('\t NOT PRESENT, SKIP!');
+            }
+        });
+    };
+
+    it('BookDB', function() {
+        console.log('Scan BookDB ...');
         $get(baseUrl);
         $('.comicBox .relativeRec').findElements(by.tagName('li')).then(function (books) {
             books.map(function(book) {
                 var link = book.findElement(by.css('h3 a'));
-                link.getAttribute('href').then(function (href) {
-                    episodes.push(href);
+                link.getText().then(function (linkName) {
+                    link.getAttribute('href').then(function (href) {
+                        console.log('\t', linkName, '-->', href);
+                        bookDB.push(new Book(linkName, href));
+                    });
                 });
             });
         });
     });
-    it('Episode n', function() {
-        saveBookFromUrl(episodes[0]);
-    });
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
+    it('Episode n', saveBookFromBookDB);
 });

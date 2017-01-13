@@ -35,3 +35,7 @@ jspm_packages
 
 # Optional REPL history
 .node_repl_history
+
+# Files downloaded by Jarvis
+books
+*.DS_Store
