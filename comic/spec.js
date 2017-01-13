@@ -1,4 +1,4 @@
-var fsUtil = require('../fsutil');
+var fsUtil = require('../utils/fsutil');
 var baseUrl = '';
 var baseFolder = '../books';
 
@@ -21,7 +21,7 @@ describe('Comic', function() {
         driver.isElementPresent(by.css('#defualtPagePic')).then(function(value) {
             if (value) {
                 $('#defualtPagePic').getAttribute('src').then(function(url) {
-                    var addr = [baseFolder, folder, count + '.jpg'].join('/');
+                    var addr = [folder, count + '.jpg'].join('/');
                     fsUtil.download(url, addr, function(){
                         console.log('\t', addr);
                     });
@@ -31,32 +31,33 @@ describe('Comic', function() {
             }
         });
     }
-    var saveBookFromBookDB = function () {
+    function saveBookFromBookDB() {
         var book = bookDB.pop();
         if (!book) {
             return;
         }
-
         console.log('\nDownload', book.name, 'from', book.url, '...');
         $get(book.url);
         driver.isElementPresent(by.css('.pageTitle a:nth-child(2)')).then(function(present) {
             if (present) {
                 $('.pageTitle a:nth-child(2)').getText().then(function(title) {
-                    fsUtil.mkdir(title);
+                    var folder = [baseFolder, title].join('/');
+                    fsUtil.mkdir(folder);
                     $('.pageTitle strong').getText().then(function(episode) {
                         var count = 1;
-                        var folder = [title, episode].join('/');
+                        folder = [folder, episode].join('/');
                         fsUtil.mkdir(folder);
                         saveImageToFolder(folder, count);
                     });
                 });
             } else {
                 console.log('\t NOT PRESENT, SKIP!');
+                saveBookFromBookDB();
             }
         });
     };
 
-    it('BookDB', function() {
+    it('Scan', function() {
         console.log('Scan BookDB ...');
         $get(baseUrl);
         $('.comicBox .relativeRec').findElements(by.tagName('li')).then(function (books) {
@@ -71,24 +72,7 @@ describe('Comic', function() {
             });
         });
     });
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
-    it('Episode n', saveBookFromBookDB);
+    it('Download', function() {
+        saveBookFromBookDB();
+    });
 });
