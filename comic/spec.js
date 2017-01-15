@@ -2,6 +2,7 @@ var fs = require('fs');
 var fsUtil = require('../utils/fsutil');
 
 describe('Comic', function() {
+    var baseFolder;
     var bookQueue = [];
     var Book = function (folder, url) {
         return {
@@ -16,18 +17,30 @@ describe('Comic', function() {
     function $(selector) {
         return driver.findElement(by.css(selector));
     }
+    function $$(selector) {
+        return driver.findElements(by.css(selector));
+    }
+    function $exist(selector) {
+        return driver.isElementPresent(by.css(selector));
+    }
     function saveImageToFolder(folder, count) {
-        driver.isElementPresent(by.css('#defualtPagePic')).then(function(value) {
-            if (value) {
-                $('#defualtPagePic').getAttribute('src').then(function(url) {
+        var image = browser.params.imageSelector;
+        var imageNext = browser.params.imageNextSelector;
+        $exist(image).then(function(exist) {
+            if (exist) {
+                $(image).getAttribute('src').then(function(url) {
+                    if (count === 1 && !fs.existsSync(folder)) {
+                        fs.mkdirSync(folder);
+                    }
                     var addr = [folder, count + '.jpg'].join('/');
-                    fsUtil.download(url, addr, function(){
+                    fsUtil.download(url, addr, function() {
                         console.log('\t', addr);
                     });
-                    $('.img_right.nextPageButtonJs').click();
+                    $(imageNext).click();
                     saveImageToFolder(folder, count + 1);
                 });
             } else {
+                console.log('\t FINISHED', folder, 'NEXT ...\n');
                 saveBookFromBookQueue();
             }
         });
@@ -40,32 +53,16 @@ describe('Comic', function() {
         }
         console.log('\nDownload', book.url, 'to', book.folder);
         $get(book.url);
-        driver.isElementPresent(by.css('.pageTitle a:nth-child(2)')).then(function(present) {
-            if (present) {
-                fs.mkdirSync(book.folder);
-                saveImageToFolder(book.folder, 1);
-            } else {
-                console.log('\t NOT PRESENT, SKIP!');
-                saveBookFromBookQueue();
-            }
-        });
+        saveImageToFolder(book.folder, 1);
     };
-
-    it('Download comic bookc', function() {
-        console.log('Scan Books ...');
-        $get(browser.baseUrl);
-        var baseFolder = browser.params.baseFolder;
-        $('.titleNav h1').getText().then(function (title) {
-            baseFolder = [baseFolder, title].join('/');
-            if (!fs.existsSync(baseFolder)) {
-                fs.mkdirSync(baseFolder);
-            }
-        });
-        $('.comicBox .relativeRec').findElements(by.tagName('li')).then(function (books) {
+    function scanBooks() {
+        var list = browser.params.booksListSelector;
+        var entry = browser.params.bookLinkSelector;
+        $$(list).then(function(books) {
             books.map(function(book) {
-                var link = book.findElement(by.css('h3 a'));
+                var link = book.findElement(by.css(entry));
                 link.getText().then(function (linkName) {
-                    link.getAttribute('href').then(function (href) {
+                    link.getAttribute('href').then(function(href) {
                         var folder = [baseFolder, linkName].join('/');
                         if (!fs.existsSync(folder)) {
                             console.log('\t Add', folder);
@@ -74,8 +71,42 @@ describe('Comic', function() {
                     });
                 });
             });
+        }).then(function () {
+            var next = browser.params.booksListNextSelector;
+            $exist(next).then(function(exist) {
+                if (exist) {
+                    var button = $(next);
+                    button.getAttribute('href').then(function(href) {
+                        if (href) {
+                            button.click();
+                            scanBooks();
+                        } else {
+                            saveBookFromBookQueue();
+                        }
+                    });
+                } else {
+                    saveBookFromBookQueue();
+                }
+            });
+        });
+    }
+
+    it('Download comic books', function() {
+        var comicName = browser.params.comicNameSelector;
+        var folder = browser.params.baseFolder;
+        var url = browser.baseUrl;
+        if (!url) {
+            console.log('$ protractor conf.js --baseUrl=...');
+            return;
+        }
+        $get(url);
+        $(comicName).getText().then(function (title) {
+            baseFolder = [folder, title].join('/');
+            if (!fs.existsSync(baseFolder)) {
+                fs.mkdirSync(baseFolder);
+            }
         }).then(function() {
-            saveBookFromBookQueue();
+            scanBooks();
         });
     });
 });

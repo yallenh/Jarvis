@@ -6,6 +6,12 @@ exports.config = {
         defaultTimeoutInterval: 6000000
     },
     params: {
-        baseFolder: '../books'
+        baseFolder: '../books',
+        imageSelector: '#defualtPagePic',
+        imageNextSelector: '.img_right.nextPageButtonJs',
+        booksListSelector: '.comicBox .relativeRec li',
+        bookLinkSelector: 'h3 a',
+        booksListNextSelector: '.pagination>:nth-last-child(1)',
+        comicNameSelector: '.titleNav h1'
     }
 }
