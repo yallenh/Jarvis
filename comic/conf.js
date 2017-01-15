@@ -4,5 +4,8 @@ exports.config = {
     specs: ['spec.js'],
     jasmineNodeOpts: {
         defaultTimeoutInterval: 6000000
+    },
+    params: {
+        baseFolder: '../books'
     }
 }

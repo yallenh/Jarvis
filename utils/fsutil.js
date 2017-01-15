@@ -8,12 +8,5 @@ module.exports = {
             // console.log('content-length:', res.headers['content-length']);
             request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
         });
-    },
-    'mkdir': function(dir) {
-        if (!fs.existsSync(dir)){
-            fs.mkdirSync(dir);
-            return true;
-        }
-        return false;
     }
 };
